@@ -1,11 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import CollectionChat from "../components/CollectionChat";
 import { JsonView } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
+
+// Component to handle search params with Suspense
+function SearchParamsHandler({
+  onLoadCollection,
+}: {
+  onLoadCollection: (id: string | null) => void;
+}) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const collectionId = searchParams.get("id");
+    onLoadCollection(collectionId);
+  }, [searchParams, onLoadCollection]);
+
+  return null;
+}
 
 export default function CollectionEditorPage() {
   const [collection, setCollection] = useState<any>(null);
@@ -13,7 +30,6 @@ export default function CollectionEditorPage() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeTab, setActiveTab] = useState<"editor" | "json">("editor");
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Check for dark mode preference
   useEffect(() => {
@@ -48,9 +64,16 @@ export default function CollectionEditorPage() {
       } catch (error) {
         console.error("Error parsing saved collection:", error);
       }
-    } else {
-      // Check if we have a collection ID in the URL
-      const collectionId = searchParams.get("id");
+    }
+  }, []);
+
+  // Handle collection ID from URL
+  const handleCollectionId = (collectionId: string | null) => {
+    // If we already have a collection, don't redirect
+    if (collection) return;
+
+    const savedCollection = localStorage.getItem("postmanCollection");
+    if (!savedCollection) {
       if (collectionId) {
         // In a real app, we would fetch the collection from an API
         // For now, we'll redirect back to home if no collection is found
@@ -59,7 +82,7 @@ export default function CollectionEditorPage() {
         router.push("/");
       }
     }
-  }, [router, searchParams]);
+  };
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -115,6 +138,9 @@ export default function CollectionEditorPage() {
         isDarkMode ? "dark bg-gray-900 text-white" : "bg-white"
       }`}
     >
+      <Suspense fallback={null}>
+        <SearchParamsHandler onLoadCollection={handleCollectionId} />
+      </Suspense>
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center">

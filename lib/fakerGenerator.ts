@@ -170,7 +170,7 @@ function generateNumber(schema: SchemaObject): number {
   if (isInteger) {
     return faker.number.int({ min, max });
   } else {
-    return faker.number.float({ min, max, precision: 0.01 });
+    return faker.number.float({ min, max, fractionDigits: 2 });
   }
 }
 
