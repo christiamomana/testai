@@ -1,0 +1,215 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PokéAPI Simplificada",
+    "version": "1.0.0",
+    "description": "Versión simplificada del OpenAPI de PokéAPI para pruebas de generación de ejemplos."
+  },
+  "servers": [
+    {
+      "url": "https://pokeapi.co/api/v2",
+      "description": "Servidor público de PokéAPI"
+    }
+  ],
+  "paths": {
+    "/pokemon/{id}": {
+      "get": {
+        "summary": "Obtener información de un Pokémon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID o nombre del Pokémon"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del Pokémon",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Pokemon" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pokemon": {
+      "post": {
+        "summary": "Crear un nuevo Pokémon",
+        "description": "Permite registrar un nuevo Pokémon personalizado en la base de datos.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NewPokemonInput" },
+              "example": {
+                "name": "flamizard",
+                "height": 17,
+                "weight": 900,
+                "abilities": [{ "name": "flame-body", "is_hidden": false }],
+                "types": [{ "name": "fire" }, { "name": "dragon" }]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pokémon creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Pokemon" },
+                "example": {
+                  "id": 999,
+                  "name": "flamizard",
+                  "height": 17,
+                  "weight": 900,
+                  "abilities": [{ "name": "flame-body", "is_hidden": false }],
+                  "types": [{ "name": "fire" }, { "name": "dragon" }]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos para la creación del Pokémon"
+          }
+        }
+      }
+    },
+    "/ability/{id}": {
+      "get": {
+        "summary": "Obtener información de una habilidad",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID o nombre de la habilidad"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información de la habilidad",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Ability" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/type/{id}": {
+      "get": {
+        "summary": "Obtener información de un tipo de Pokémon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID o nombre del tipo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del tipo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Type" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Pokemon": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 25 },
+          "name": { "type": "string", "example": "pikachu" },
+          "height": { "type": "integer", "example": 4 },
+          "weight": { "type": "integer", "example": 60 },
+          "abilities": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AbilitySummary" }
+          },
+          "types": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TypeSummary" }
+          }
+        }
+      },
+      "NewPokemonInput": {
+        "type": "object",
+        "required": ["name", "height", "weight", "abilities", "types"],
+        "properties": {
+          "name": { "type": "string", "example": "flamizard" },
+          "height": { "type": "integer", "example": 17 },
+          "weight": { "type": "integer", "example": 900 },
+          "abilities": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AbilitySummary" }
+          },
+          "types": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TypeSummary" }
+          }
+        }
+      },
+      "Ability": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 65 },
+          "name": { "type": "string", "example": "overgrow" },
+          "effect": {
+            "type": "string",
+            "example": "Boosts the power of Grass-type moves when HP is low."
+          },
+          "generation": { "type": "string", "example": "generation-iii" }
+        }
+      },
+      "Type": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 12 },
+          "name": { "type": "string", "example": "grass" },
+          "damage_relations": {
+            "type": "object",
+            "properties": {
+              "double_damage_from": {
+                "type": "array",
+                "items": { "type": "string" },
+                "example": ["fire", "ice", "poison"]
+              },
+              "double_damage_to": {
+                "type": "array",
+                "items": { "type": "string" },
+                "example": ["water", "ground", "rock"]
+              }
+            }
+          }
+        }
+      },
+      "AbilitySummary": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "static" },
+          "is_hidden": { "type": "boolean", "example": false }
+        }
+      },
+      "TypeSummary": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "electric" }
+        }
+      }
+    }
+  }
+}
