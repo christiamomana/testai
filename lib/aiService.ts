@@ -401,7 +401,7 @@ var globalValue = pm.globals.get("global_var");
     choices: [
       {
         message: {
-          role: "assistant",
+          role: "assistant" as const,
           content: responseContent,
         },
         finish_reason: "stop",
